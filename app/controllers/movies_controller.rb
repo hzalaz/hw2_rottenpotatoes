@@ -9,8 +9,26 @@ class MoviesController < ApplicationController
   def index
     @order_hilite = {}
     @all_ratings = Movie.valid_ratings
-    if params[:ratings] then
-      condition = ["rating in (?)", params[:ratings].keys]
+    ratings = params[:ratings]
+    if ratings.nil? then
+      ratings = session[:ratings]
+      should_redirect = !ratings.nil?
+    else
+      session[:ratings] = ratings
+    end
+    order = params[:order]
+    if order.nil? then
+      order = session[:order]
+      should_redirect = should_redirect or !order.nil?
+    else
+      session[:order] = order
+    end
+    if should_redirect then
+      redirect_to movies_path({:order => order, :ratings => ratings})
+    end
+
+    if ratings then
+      condition = ["rating in (?)", ratings.keys]
     end
     @movies = Movie.find(:all, :order => params[:order], :conditions => condition)
     if params[:order] then
