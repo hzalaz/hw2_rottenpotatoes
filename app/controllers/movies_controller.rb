@@ -8,11 +8,13 @@ class MoviesController < ApplicationController
 
   def index
     @order_hilite = {}
+    @all_ratings = Movie.valid_ratings
+    if params[:ratings] then
+      condition = ["rating in (?)", params[:ratings].keys]
+    end
+    @movies = Movie.find(:all, :order => params[:order], :conditions => condition)
     if params[:order] then
-      @movies = Movie.find(:all, :order => params[:order])
       @order_hilite = {params[:order] => 'hilite'}
-    else
-      @movies = Movie.all
     end
   end
 
